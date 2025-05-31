@@ -3,14 +3,13 @@ from datetime import date, datetime
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 
-# --------- CONFIGURATION ---------
-SPREADSHEET_URL = st.secrets["gsheets_url"]  # Stocke l'URL dans .streamlit/secrets.toml pour la sécurité
-
-# Connexion à Google Sheets
+# --------- CONNEXION GOOGLE SHEETS ---------
 conn = st.connection("gsheets", type=GSheetsConnection)
-objectifs_df = conn.read(spreadsheet=SPREADSHEET_URL, worksheet="Objectifs")
-sousobjectifs_df = conn.read(spreadsheet=SPREADSHEET_URL, worksheet="SousObjectifs")
-reflexions_df = conn.read(spreadsheet=SPREADSHEET_URL, worksheet="Reflexions")
+
+# Lecture des worksheets (onglets)
+objectifs_df = conn.read(worksheet="Objectifs")
+sousobjectifs_df = conn.read(worksheet="SousObjectifs")
+reflexions_df = conn.read(worksheet="Reflexions")
 
 # --------- PAGE D'ACCUEIL ---------
 st.title("Bienvenue Alexandre sur ton application de définition et de suivi de tes objectifs")
@@ -27,7 +26,7 @@ if st.button("Enregistrer mes réflexions"):
         "Texte": reflexion_input
     }
     reflexions_df = pd.concat([reflexions_df, pd.DataFrame([nouvelle_reflexion])], ignore_index=True)
-    conn.write(reflexions_df, spreadsheet=SPREADSHEET_URL, worksheet="Reflexions")
+    conn.write(reflexions_df, worksheet="Reflexions")
     st.success("Réflexion enregistrée dans Google Sheets !")
 
 st.markdown("---")
@@ -60,7 +59,7 @@ if onglet == "Objectifs de vie":
                 "Avancement": avancement
             }
             objectifs_df = pd.concat([objectifs_df, pd.DataFrame([nouvel_objectif])], ignore_index=True)
-            conn.write(objectifs_df, spreadsheet=SPREADSHEET_URL, worksheet="Objectifs")
+            conn.write(objectifs_df, worksheet="Objectifs")
             st.success("Objectif de vie ajouté dans Google Sheets !")
 
     st.markdown("### Tes objectifs de vie")
@@ -112,7 +111,7 @@ if onglet == "Sous-objectifs":
                     "Avancement": sous_avancement
                 }
                 sousobjectifs_df = pd.concat([sousobjectifs_df, pd.DataFrame([nouveau_sous_objectif])], ignore_index=True)
-                conn.write(sousobjectifs_df, spreadsheet=SPREADSHEET_URL, worksheet="SousObjectifs")
+                conn.write(sousobjectifs_df, worksheet="SousObjectifs")
                 st.success("Sous-objectif ajouté dans Google Sheets !")
 
     st.markdown("### Tes sous-objectifs")
